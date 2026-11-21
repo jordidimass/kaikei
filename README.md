@@ -6,7 +6,9 @@
 
 **Every number opens down to the row.**
 
-Kaikei is a budget-vs-actual workspace for small-business owners. Upload the CSVs and PDF bills you already have, and answer "why did this number change?" in one place, then click through to the exact CSV row, the bill, and the match between them. Your AI assistant gets the same answer from the same records over MCP.
+kaikei consolidates every company's budget pack into one reporting currency, eliminates intercompany flows, flags every problem before it reaches a total and opens each group figure down to the source cell. AI assistants (Claude, ChatGPT, Cursor, Grok) read the same published run over a read-only MCP connector.
+
+The landing is in Spanish; its copy mirrors the platform's site dictionary (`kaikei-remote/components/site/dict.ts`) and lives in `src/lib/copy.ts`. Sign-up links point to the platform at app.kaikei.io.
 
 **Website:** [kaikei.io](https://kaikei.io)
 
@@ -44,7 +46,5 @@ pnpm dev
 Next.js (App Router) · Tailwind CSS 4 · deployed on Vercel.
 
 Design follows the kaikei brand guidelines v1.0: folder beige `#DCD1C2`, ink black `#212927`, accent blue `#3544D5`, the ledger frame with a check column on the right, and one filled blue cell per layout. Logo files live in `public/brand/` and `assets/`.
-
-Sample files live in `public/samples/`.
 
 Typefaces: [Excon](https://www.fontshare.com/fonts/excon) and [Synonym](https://www.fontshare.com/fonts/synonym) by Indian Type Foundry (ITF Free Font License). Brand icons from [simple-icons](https://simpleicons.org) (CC0) and [LobeHub Icons](https://github.com/lobehub/lobe-icons) (MIT).

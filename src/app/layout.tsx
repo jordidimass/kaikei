@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next"
 import localFont from "next/font/local"
 
 import { SiteFooter, SiteHeader } from "@/components/site-chrome"
+import { copy } from "@/lib/copy"
 import { site } from "@/lib/site"
 import "./globals.css"
 
@@ -22,9 +23,8 @@ const synonym = localFont({
   ],
 })
 
-const title = "kaikei · Every number opens down to the row"
-const description =
-  "kaikei turns your CSV exports and PDF bills into budget vs actual and cash flow. Every figure opens down to the row and the bill behind it, and your AI assistant reads the same numbers."
+const title = copy.meta.title
+const description = copy.meta.description
 
 export const metadata: Metadata = {
   metadataBase: new URL(site.url),
@@ -32,10 +32,11 @@ export const metadata: Metadata = {
   description,
   openGraph: {
     title,
-    description: "Accounting you can trace back to the row. Ask Grok, Claude or ChatGPT and get the same answer.",
+    description: copy.meta.ogNote,
     url: site.url,
     siteName: "kaikei",
     type: "website",
+    locale: "es_GT",
   },
   twitter: { card: "summary_large_image" },
 }
@@ -47,7 +48,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" className={`${excon.variable} ${synonym.variable} antialiased`}>
+    <html lang="es" className={`${excon.variable} ${synonym.variable} antialiased`}>
       <body className="flex min-h-dvh flex-col">
         <SiteHeader />
         <main className="mx-auto w-full max-w-[1296px] flex-1 px-5 md:px-8 lg:px-12">{children}</main>

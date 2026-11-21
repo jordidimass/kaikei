@@ -46,7 +46,7 @@ export async function renderOg({ title, note }: { title: string; note: string })
         >
           <div style={{ display: "flex", fontFamily: "Synonym", fontSize: 22 }}>kaikei.io</div>
           <div style={{ display: "flex", flexDirection: "column" }}>
-            <div style={{ display: "flex", fontFamily: "Excon", fontSize: 68, lineHeight: 1.05, letterSpacing: -2 }}>{title}</div>
+            <div style={{ display: "flex", fontFamily: "Excon", fontSize: 60, lineHeight: 1.05, letterSpacing: -1.8 }}>{title}</div>
             <div style={{ display: "flex", alignItems: "center", gap: 20, marginTop: 40 }}>
               <div style={{ width: 36, height: 36, background: blue }} />
               <div style={{ display: "flex", fontFamily: "Synonym", fontSize: 22 }}>{note}</div>
