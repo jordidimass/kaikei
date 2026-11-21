@@ -1,145 +1,155 @@
-import { ArrowDownIcon, ArrowDownToLineIcon, ArrowRightIcon } from "lucide-react"
+import { ArrowDownToLineIcon } from "lucide-react"
 
+import { LedgerFrame, LedgerRow } from "@/components/ledger"
 import { McpSection } from "@/components/mcp-section"
-import { clients } from "@/lib/clients"
+import { DrilldownMock } from "@/components/product-mocks"
 import { ProductShowcase } from "@/components/product-showcase"
-import { site } from "@/lib/site"
+import { cn } from "@/lib/utils"
 
-const principles = [
+const values = [
   {
-    title: "AI proposes. Rules verify. You approve.",
-    body: "AI reads files, suggests column mappings, extracts bill fields and phrases answers. It never writes a figure, accepts a record or confirms a link.",
+    title: "Traceable",
+    body: "Every figure points to its source: the file, the row, the bill. Click a number and you land on the records that add up to it.",
+    filled: true,
   },
   {
-    title: "Same numbers with AI on or off.",
-    body: "Every figure comes from one deterministic function. Turn the AI off and the dashboard, the variance and the MCP answers don't move.",
+    title: "Exact",
+    body: "Money is stored in whole cents with its currency, and each transaction counts once, however many times you upload an export.",
   },
   {
-    title: "Your files stay as you sent them.",
-    body: "Each upload is stored unchanged with its SHA-256 hash, and every row is kept raw. Accepted records point back to the row they came from.",
+    title: "Owner-first",
+    body: "We speak your language: over budget, bill attached, Deliveries. Never ledger jargon.",
   },
   {
-    title: "Each transaction counts once.",
-    body: "Re-upload the same file or a newer export that overlaps the last one and only the new rows are added. A bill adds proof, not an amount.",
-  },
-  {
-    title: "Nothing uncertain slips through.",
-    body: "Ambiguous mappings, low-confidence extractions and unsure matches wait in review. Rows that can't be read are flagged where they are.",
-  },
-  {
-    title: "Money is exact.",
-    body: "Amounts are stored as integer cents with a currency code. No floats, and no summing across currencies without a recorded rate.",
+    title: "Honest about uncertainty",
+    body: "AI suggests, rules check, you approve. The figures are the same with AI on or off, and anything unsure waits for you.",
   },
 ]
 
-function SampleLinks({ className }: { className?: string }) {
+const voice = [
+  ["Over budget", "Negative variance"],
+  ["Bill attached", "Supporting document linked to journal entry"],
+  ["1 new, 2 already imported", "Import completed successfully"],
+  ["We couldn't read row 4: the amount has a letter in it.", "Error: parse failure"],
+  ["Suggested by AI, waiting for you", "Auto-categorised"],
+]
+
+function SampleButtons({ primary = "ink" }: { primary?: "ink" | "blue" }) {
   return (
-    <div className={className}>
-      {site.samples.map((s, i) => (
-        <a
-          key={s.href}
-          href={s.href}
-          download
-          className={
-            i === 0
-              ? "pressable type-ui flex h-11 flex-1 items-center justify-center gap-2 rounded-md bg-signal px-5 font-medium text-background hover:bg-signal/90"
-              : "pressable type-ui flex h-11 flex-1 items-center justify-center gap-2 rounded-md border border-border bg-background/70 px-5 text-foreground backdrop-blur hover:border-foreground/25"
-          }
-        >
-          <ArrowDownToLineIcon className="size-4" />
-          {s.label}
-        </a>
-      ))}
+    <div className="flex flex-wrap gap-3">
+      <a
+        href="/samples/sample_actuals_nov.csv"
+        download
+        className={cn("btn", primary === "blue" ? "btn-primary" : "btn-ink")}
+      >
+        <ArrowDownToLineIcon className="size-4" aria-hidden />
+        Actuals CSV
+      </a>
+      <a href="/samples/sample_budget_nov.csv" download className="btn btn-secondary">
+        <ArrowDownToLineIcon className="size-4" aria-hidden />
+        Budget CSV
+      </a>
     </div>
   )
 }
 
 export default function Home() {
   return (
-    <>
-      <section className="relative mx-auto flex min-h-[calc(100dvh-7.5rem)] w-full max-w-3xl flex-col items-center justify-center py-12 text-center max-md:min-h-[calc(100dvh-6.5rem)] max-md:py-[2dvh]">
-        <p className="reveal type-ui text-muted-foreground">
-          <span className="text-signal">●</span> budget vs actual <span className="text-border">/</span> bills{" "}
-          <span className="text-border">/</span> MCP
-        </p>
-        <h1 className="reveal type-display mt-6 max-md:mt-[2.5dvh] max-md:text-[min(10.5vw,6.4dvh)] [animation-delay:60ms]">
-          Every number opens down to the row.
-        </h1>
-        <p className="reveal type-body mt-6 max-w-[36rem] max-md:mt-[2.5dvh] max-md:text-[13px] max-md:leading-[1.6] [animation-delay:120ms]">
-          Kaikei turns the CSVs and PDF bills your business already has into budget vs actual and cash flow. Click any
-          figure to reach the exact row and receipt behind it. Your AI assistant reads the same numbers.
-        </p>
-
-        <div className="reveal mt-10 flex w-full max-w-md flex-col gap-2 max-md:mt-[4dvh] [animation-delay:180ms]">
-          <SampleLinks className="flex gap-2 max-[400px]:flex-col" />
-          <p className="type-small text-[12px]">Sample files from a small delivery business, Nov 2026, in GTQ.</p>
-        </div>
-
-        <div className="reveal mt-12 flex flex-col items-center gap-4 max-md:mt-[4.5dvh] max-md:gap-3 [animation-delay:240ms]">
-          <p className="type-label text-muted-foreground">Ask from your assistant</p>
-          <div className="flex flex-wrap justify-center gap-2">
-            {clients.map((c) => (
-              <a
-                key={c.name}
-                href="#mcp"
-                className="pressable type-ui flex h-10 items-center gap-2.5 rounded-md border border-border bg-background/70 px-3.5 text-foreground backdrop-blur max-sm:h-9 max-sm:gap-1.5 max-sm:px-2.5 max-sm:text-xs [@media(hover:hover)]:hover:border-foreground/25"
-              >
-                <svg viewBox="0 0 24 24" aria-hidden className="size-4 fill-current">
-                  <path d={c.path} />
-                </svg>
-                {c.name}
-              </a>
-            ))}
+    <LedgerFrame>
+      <section className="grid grid-cols-[minmax(0,1fr)] lg:grid-cols-[minmax(0,1fr)_216px]">
+        <aside className="hidden border-l-[3px] border-ink p-6 lg:order-2 lg:flex lg:flex-col lg:gap-6">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/brand/kaikei-logo-primary.svg" alt="" width={168} height={168} className="h-auto w-full" />
+          <p className="t-small font-semibold">会計: accounting. What came in, what went out and why.</p>
+        </aside>
+        <div className="grid min-w-0 grid-cols-[minmax(0,1fr)] gap-12 px-5 py-12 md:px-8 lg:order-1 lg:grid-cols-[minmax(0,6fr)_minmax(0,6fr)] lg:items-center lg:px-12 lg:py-24">
+          <div className="reveal">
+            <p className="t-label text-ink/75">Budget vs actual for small businesses</p>
+            <h1 className="t-display mt-3">Every number opens down to the row.</h1>
+            <p className="t-lead mt-6 max-w-[34rem] text-ink/80">
+              Upload the CSVs and PDF bills you already have. kaikei shows budget, actual and cash, and every figure opens
+              to the exact row and bill behind it. Your AI assistant reads the same numbers.
+            </p>
+            <div className="mt-8">
+              <SampleButtons />
+            </div>
+            <p className="t-small mt-4 text-ink/70">
+              Sample files from a small delivery business in Guatemala, November 2026.
+            </p>
+          </div>
+          <div className="reveal [animation-delay:120ms]">
+            <DrilldownMock />
           </div>
         </div>
-
-        <a
-          href="#how"
-          className="type-label absolute bottom-4 left-1/2 flex -translate-x-1/2 items-center gap-2 text-muted-foreground transition-colors duration-150 hover:text-foreground max-md:hidden"
-        >
-          See how it works
-          <ArrowDownIcon className="scroll-cue size-3.5" />
-        </a>
       </section>
 
-      <ProductShowcase />
-
-      <McpSection />
-
-      <section id="principles" className="scroll-mt-8 pb-28">
-        <div className="fade-up max-w-xl">
-          <p className="type-label flex items-center gap-2 text-muted-foreground">
-            <span className="text-signal">07</span>
-            Principles
-          </p>
-          <h2 className="type-title mt-4 text-[clamp(1.75rem,1.3rem+1.6vw,2.5rem)]">
-            If we can&apos;t trace it, we don&apos;t show it.
-          </h2>
-        </div>
-        <ul className="mt-12 grid gap-px overflow-hidden rounded-xl border border-border bg-border sm:grid-cols-2 lg:grid-cols-3">
-          {principles.map((p, i) => (
-            <li key={p.title} className="fade-up bg-background/90 p-6 backdrop-blur">
-              <p className="type-label text-signal tabular-nums">{String(i + 1).padStart(2, "0")}</p>
-              <h3 className="type-heading mt-4 text-[15px]">{p.title}</h3>
-              <p className="type-small mt-2">{p.body}</p>
-            </li>
-          ))}
-        </ul>
-      </section>
-
-      <section className="mx-auto flex w-full max-w-md flex-col items-center gap-4 pb-24 text-center">
-        <h2 className="type-title">Why did this number change?</h2>
-        <p className="type-body">
-          Grab the sample files and follow one upload from CSV row to dashboard to assistant.
+      <LedgerRow id="how" n="02" title="How it works" note="From file to figure to row">
+        <h2 className="t-h2 max-w-[40rem]">Why did this number change? Answer it in one place.</h2>
+        <p className="t-lead mt-4 max-w-[40rem] text-ink/80">
+          Your files stay exactly as you sent them. kaikei reads them, asks when it isn&apos;t sure, and keeps a line from
+          every figure back to its source.
         </p>
-        <SampleLinks className="mt-2 flex w-full gap-2 max-[400px]:flex-col" />
-        <a
-          href="#how"
-          className="type-ui mt-2 flex items-center gap-1.5 text-muted-foreground transition-colors duration-150 hover:text-foreground"
-        >
-          Walk through it again <ArrowRightIcon className="size-3.5" />
-        </a>
-      </section>
-    </>
+        <ProductShowcase />
+      </LedgerRow>
+
+      <LedgerRow id="assistants" n="03" title="AI assistants" note="Read-only, over MCP">
+        <McpSection />
+      </LedgerRow>
+
+      <LedgerRow id="principles" n="04" title="Principles" note="What we stand on">
+        <h2 className="t-h2">Four principles, one system.</h2>
+        <div className="mt-8 grid grid-cols-[minmax(0,1fr)] gap-6 md:grid-cols-2">
+          {values.map((v) => (
+            <div key={v.title} className="relative min-h-48 p-6 outline-1 -outline-offset-1 outline-ink">
+              <h3 className="t-h3">{v.title}</h3>
+              <p className="t-body mt-3 max-w-[28rem] text-ink/80">{v.body}</p>
+              {v.filled && <span aria-hidden className="absolute right-0 bottom-0 size-10 bg-blue" />}
+            </div>
+          ))}
+        </div>
+      </LedgerRow>
+
+      <LedgerRow id="voice" n="05" title="Plain words" note="How kaikei talks to you">
+        <div className="grid grid-cols-[minmax(0,1fr)] gap-12 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)]">
+          <div>
+            <h2 className="t-h2">Plain words. Exact numbers.</h2>
+            <p className="t-body mt-4 text-ink/80">
+              kaikei writes like a sharp, calm bookkeeper: what changed, by how much, and where it came from. Errors say how
+              to fix them.
+            </p>
+            <p className="t-sub mt-6">&ldquo;If we can&apos;t trace it, we don&apos;t show it.&rdquo;</p>
+          </div>
+          <table className="w-full border-collapse self-start text-left">
+            <thead>
+              <tr className="border-b border-ink">
+                <th className="py-2 pr-6 font-semibold">We say</th>
+                <th className="py-2 font-semibold">We don&apos;t say</th>
+              </tr>
+            </thead>
+            <tbody>
+              {voice.map(([say, not]) => (
+                <tr key={say} className="border-b border-ink/40 align-top">
+                  <td className="py-3 pr-6 font-medium">{say}</td>
+                  <td className="py-3 text-ink/60">{not}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </LedgerRow>
+
+      <LedgerRow id="try" n="06" title="Try it" note="Two files, one walkthrough">
+        <div className="max-w-[40rem]">
+          <h2 className="t-h2">Follow one upload from row to answer.</h2>
+          <p className="t-lead mt-4 text-ink/80">
+            The sample has a Q 3,000 Deliveries budget, Q 2,700 spent, and one new Q 600 expense that tips it over. Watch
+            where it goes.
+          </p>
+          <div className="mt-8">
+            <SampleButtons primary="blue" />
+          </div>
+        </div>
+      </LedgerRow>
+    </LedgerFrame>
   )
 }

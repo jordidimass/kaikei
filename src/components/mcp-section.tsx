@@ -1,8 +1,4 @@
-"use client"
-
-import { useEffect, useRef, useState } from "react"
 import { clients } from "@/lib/clients"
-import { cn } from "@/lib/utils"
 
 const tools = [
   "get_overview",
@@ -14,155 +10,118 @@ const tools = [
   "what_changed",
 ]
 
-type Line =
-  | { kind: "user"; text: string }
-  | { kind: "tool"; name: string; args: string; result: string }
-  | { kind: "answer"; text: string; cites: string[] }
-
-const transcript: Line[] = [
-  { kind: "user", text: "¿Cuánto nos pasamos del presupuesto de entregas y qué comprobante respalda el último gasto?" },
-  { kind: "tool", name: "get_budget_variance", args: '{ "category": "entregas" }', result: "Deliveries · Nov 2026 · GTQ" },
-  { kind: "tool", name: "get_transaction", args: '{ "id": "txn_7f3a" }', result: "1 confirmed document" },
-  {
-    kind: "answer",
-    text: "En noviembre van Q3,300 en Entregas contra un presupuesto de Q3,000: Q300 por encima. El último gasto es de Q600 a Transportes Rápidos el 18 de noviembre, respaldado por la factura bill_transportes_rapidos.pdf.",
-    cites: ["txn_7f3a", "sample_actuals_nov.csv:3", "doc_0193", "as_of imp_0412"],
-  },
+const calls = [
+  { name: "get_budget_variance", args: "category: entregas", result: "Deliveries, Nov 2026, GTQ" },
+  { name: "get_transaction", args: "id: txn_7f3a", result: "1 bill, confirmed" },
 ]
 
+const sources = ["txn_7f3a", "sample_actuals_nov.csv, row 3", "bill_transportes_rapidos.pdf"]
+
 function Transcript() {
-  const ref = useRef<HTMLDivElement>(null)
-  const [shown, setShown] = useState(false)
-
-  useEffect(() => {
-    const el = ref.current
-    if (!el) return
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setShown(true)
-          observer.disconnect()
-        }
-      },
-      { rootMargin: "0px 0px -25% 0px" }
-    )
-    observer.observe(el)
-    return () => observer.disconnect()
-  }, [])
-
   return (
-    <div ref={ref} className="overflow-hidden rounded-xl border border-border bg-card shadow-[0_40px_120px_-50px_oklch(0.74_0.14_162/0.4)]">
-      <div className="flex h-8 items-center gap-1.5 border-b border-border px-3">
-        <span className="size-2 rounded-full bg-foreground/15" />
-        <span className="size-2 rounded-full bg-foreground/15" />
-        <span className="size-2 rounded-full bg-foreground/15" />
-        <span className="type-ui ml-3 text-[11px] text-muted-foreground">grok · kaikei mcp</span>
+    <div className="border-[3px] border-ink text-[15px] leading-6">
+      <div className="flex items-baseline justify-between gap-4 border-b-[3px] border-ink px-4 py-3">
+        <p className="font-display text-base font-medium">Grok, connected to kaikei</p>
+        <p className="text-xs text-ink/70">read-only</p>
       </div>
-      <ol className="space-y-4 p-5 font-mono text-[13px] leading-relaxed sm:p-6">
-        {transcript.map((line, i) => (
-          <li
-            key={i}
-            style={{ transitionDelay: shown ? `${i * 380}ms` : "0ms" }}
-            className={cn(
-              "transition-[opacity,transform] duration-500 ease-[var(--ease-out)] motion-reduce:translate-y-0",
-              shown ? "translate-y-0 opacity-100" : "translate-y-2 opacity-0"
-            )}
-          >
-            {line.kind === "user" && (
-              <p className="text-foreground">
-                <span className="text-signal">›</span> {line.text}
+      <div className="grid grid-cols-[minmax(0,1fr)] md:grid-cols-[minmax(0,1fr)_34%]">
+        <div className="min-w-0">
+          <div className="border-b border-ink px-4 py-3">
+            <p className="text-xs text-ink/70">You asked</p>
+            <p className="mt-1 font-medium">
+              ¿Cuánto nos pasamos del presupuesto de entregas y qué comprobante respalda el último gasto?
+            </p>
+          </div>
+          {calls.map((c) => (
+            <div key={c.name} className="grid grid-cols-[minmax(0,1fr)_auto] gap-3 border-b border-ink/30 px-4 py-2 text-[13px]">
+              <span className="truncate">
+                <span className="font-medium">{c.name}</span> <span className="text-ink/70">{c.args}</span>
+              </span>
+              <span className="text-ink/70">{c.result}</span>
+            </div>
+          ))}
+          <div className="px-4 py-3">
+            <p className="text-xs text-ink/70">Grok answered</p>
+            <p className="mt-1">
+              En noviembre van Q 3,300 en Entregas contra un presupuesto de Q 3,000: Q 300 por encima. El último gasto es
+              de Q 600 a Transportes Rápidos el 18 de noviembre, respaldado por la factura bill_transportes_rapidos.pdf.
+            </p>
+          </div>
+        </div>
+        <div className="flex flex-col border-t-[3px] border-ink md:border-t-0 md:border-l-[3px]">
+          <div className="flex flex-col gap-2 px-4 py-3 text-[13px] [overflow-wrap:anywhere]">
+            <p className="font-semibold">Source</p>
+            {sources.map((s) => (
+              <p key={s} className="text-ink/80">
+                {s}
               </p>
-            )}
-            {line.kind === "tool" && (
-              <p className="flex flex-wrap items-baseline gap-x-2 text-muted-foreground">
-                <span className="text-signal">●</span>
-                <span className="text-foreground">{line.name}</span>
-                <span>{line.args}</span>
-                <span className="text-muted-foreground/70">→ {line.result}</span>
-              </p>
-            )}
-            {line.kind === "answer" && (
-              <div className="border-l border-border pl-4 text-foreground/90">
-                <p>{line.text}</p>
-                <p className="mt-3 flex flex-wrap gap-1.5">
-                  {line.cites.map((id) => (
-                    <span key={id} className="rounded border border-border px-1.5 py-0.5 font-mono text-[11px] text-muted-foreground">
-                      {id}
-                    </span>
-                  ))}
-                </p>
-              </div>
-            )}
-          </li>
-        ))}
-      </ol>
+            ))}
+          </div>
+          <div className="mt-auto border-t-[3px] border-ink bg-blue px-4 py-3 text-white">
+            <p className="text-xs">as_of</p>
+            <p className="font-medium">imp_0412, same as the app</p>
+          </div>
+        </div>
+      </div>
     </div>
   )
 }
 
 export function McpSection() {
   return (
-    <section id="mcp" className="scroll-mt-8 pb-28">
-      <div className="grid grid-cols-[minmax(0,1fr)] gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.45fr)] lg:items-center lg:gap-16">
-        <div className="fade-up">
-          <p className="type-label flex items-center gap-2 text-muted-foreground">
-            <span className="text-signal">06</span>
-            MCP
+    <>
+      <div className="grid grid-cols-[minmax(0,1fr)] gap-12 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)]">
+        <div>
+          <h2 className="t-h2">Ask your assistant. Get the same number.</h2>
+          <p className="t-lead mt-4 text-ink/80">
+            Each workspace has one read-only MCP address. Grok, Claude or ChatGPT call the same code as the dashboard and
+            get back the figure, the period, the currency and links to the rows and bills behind it.
           </p>
-          <h2 className="type-title mt-4 text-[clamp(1.75rem,1.3rem+1.6vw,2.5rem)]">Ask your assistant. Get the same number.</h2>
-          <p className="type-body mt-4 max-w-sm">
-            Each workspace has one read-only MCP endpoint. Grok, Claude or ChatGPT call the same code the dashboard
-            uses and get back figures, the period, the currency and links to the rows and bills behind them. The
-            assistant phrases the answer. It never does the math.
+          <p className="t-body mt-4 text-ink/80">
+            The assistant writes the sentence. It never does the maths, and it can&apos;t import a file, confirm a match or
+            change a figure.
           </p>
-          <ul className="mt-6 flex max-w-sm flex-wrap gap-1.5">
-            {tools.map((tool) => (
-              <li key={tool} className="type-ui rounded-md border border-border px-2 py-1 text-[11px] text-muted-foreground">
-                {tool}
+        </div>
+        <Transcript />
+      </div>
+
+      <div className="mt-16 grid grid-cols-[minmax(0,1fr)] gap-12 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)]">
+        <div>
+          <h3 className="t-h3">One address, any assistant.</h3>
+          <p className="t-body mt-3 text-ink/80">
+            Copy it from Settings, Connect AI. Every answer carries an <span className="font-medium">as_of</span> stamp so you
+            can check it read what you see in the app.
+          </p>
+          <ul className="mt-6 flex flex-wrap gap-2">
+            {tools.map((t) => (
+              <li key={t} className="px-2 py-1 text-[13px] outline-1 -outline-offset-1 outline-ink">
+                {t}
               </li>
             ))}
           </ul>
         </div>
-        <div className="fade-up min-w-0">
-          <Transcript />
-        </div>
-      </div>
-
-      <div className="mt-16 grid grid-cols-[minmax(0,1fr)] gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.45fr)] lg:gap-16">
-        <div className="fade-up">
-          <h3 className="type-heading text-base">One URL, any assistant</h3>
-          <p className="type-small mt-3 max-w-sm">
-            Copy the endpoint from <span className="text-foreground">Settings → Connect AI</span> and paste it into
-            your client. Every answer carries an <span className="text-foreground">as_of</span> stamp, so you can check
-            it read the same data you see in the app.
+        <div className="self-start border-[3px] border-ink">
+          <p className="truncate border-b-[3px] border-ink px-4 py-3 font-medium">
+            https://kaikei.io/api/mcp/<span className="text-ink/60">your-workspace-token</span>
           </p>
-          <p className="type-small mt-4 max-w-sm">
-            <span className="text-foreground">Read-only.</span> No tool can import a file, confirm a match or change a
-            figure. Those stay with you.
-          </p>
-        </div>
-        <div className="fade-up min-w-0 overflow-hidden rounded-xl border border-border bg-background/60">
-          <div className="border-b border-border px-5 py-3.5">
-            <code className="type-ui block truncate text-foreground">
-              <span className="text-signal">https://</span>kaikei.io/api/mcp/
-              <span className="text-muted-foreground">&lt;workspace-token&gt;</span>
-            </code>
-          </div>
-          <ul className="divide-y divide-border">
+          <ul>
             {clients.map((c) => (
-              <li key={c.name} className="flex flex-col gap-1 px-5 py-3.5 sm:flex-row sm:items-center sm:gap-6">
-                <span className="type-ui flex shrink-0 items-center gap-2.5 text-foreground sm:w-28">
+              <li
+                key={c.name}
+                className="grid grid-cols-[minmax(0,1fr)] gap-1 border-b border-ink/30 px-4 py-3 last:border-b-0 sm:grid-cols-[140px_minmax(0,1fr)] sm:gap-6"
+              >
+                <span className="flex items-center gap-2 font-medium">
                   <svg viewBox="0 0 24 24" aria-hidden className="size-4 fill-current">
                     <path d={c.path} />
                   </svg>
                   {c.name}
                 </span>
-                <span className="type-small text-[13px]">{c.note}</span>
+                <span className="t-small text-ink/80">{c.note}</span>
               </li>
             ))}
           </ul>
         </div>
       </div>
-    </section>
+    </>
   )
 }

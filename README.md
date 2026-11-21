@@ -41,8 +41,10 @@ pnpm install
 pnpm dev
 ```
 
-Next.js (App Router) · Tailwind CSS 4 · shadcn/ui · deployed on Vercel.
+Next.js (App Router) · Tailwind CSS 4 · deployed on Vercel.
+
+Design follows the kaikei brand guidelines v1.0: folder beige `#DCD1C2`, ink black `#212927`, accent blue `#3544D5`, the ledger frame with a check column on the right, and one filled blue cell per layout. Logo files live in `public/brand/` and `assets/`.
 
 Sample files live in `public/samples/`.
 
-Website typefaces: [Sentient](https://www.fontshare.com/fonts/sentient) (ITF Free Font License) and [JetBrains Mono](https://www.jetbrains.com/lp/mono/) (OFL). Brand icons from [simple-icons](https://simpleicons.org) (CC0) and [LobeHub Icons](https://github.com/lobehub/lobe-icons) (MIT).
+Typefaces: [Excon](https://www.fontshare.com/fonts/excon) and [Synonym](https://www.fontshare.com/fonts/synonym) by Indian Type Foundry (ITF Free Font License). Brand icons from [simple-icons](https://simpleicons.org) (CC0) and [LobeHub Icons](https://github.com/lobehub/lobe-icons) (MIT).
